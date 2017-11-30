@@ -11,6 +11,7 @@ reader = csv.reader(raw_data)
 x = list(reader)
 print(x[0])
 
+#remove the uncertainity columns
 x = np.delete(x,2,axis = 1)
 x = np.delete(x,3,axis = 1)
 x = np.delete(x,4,axis = 1)
@@ -30,20 +31,24 @@ date1 = "1849-12-31"
 for y in x[1:]:
     date2 = y[0]
     if time.strptime(date1, "%Y-%m-%d") < time.strptime(date2, "%Y-%m-%d"):
-        regex = re.compile('\d{4}')
-        year = regex.search(date2)
-        print('year',year.group())
-        y[0] = year.group()
+        # regex = re.compile('\d{4}')
+        # year = regex.search(date2)
+        # # print('year',year.group())
+        # y[0] = year.group()
         fulldata.append(y)
 
-# fulldata = np.delete(fulldata,0,axis=1)
-# fulldata = np.ndarray.tolist(fulldata)
-print(fulldata[0])
+#remove the 'year' column
+fulldata = np.delete(fulldata,0,axis=1)
+fulldata = np.ndarray.tolist(fulldata)
+print('fuldata=',fulldata[0])
 
-labels = np.asarray(fulldata)[:,1]
+#get the first column i.e. landaverage temprature as labels
+labels = np.asarray(fulldata)[:,0]
 labels = np.ndarray.tolist(labels)
 print(labels[0])
-fulldata = np.delete(fulldata,1, axis = 1)
+
+#remove the colums used as labels
+fulldata = np.delete(fulldata,0, axis = 1)
 fulldata = np.ndarray.tolist(fulldata)
 print(fulldata[0])
 trainX = fulldata[:int((len(fulldata)+1)*.80)] #Remaining 80% to training set
@@ -59,7 +64,7 @@ testY = labels[int((len(labels)+1)*.80):]
 
 print(np.shape(trainY),np.shape(testY))
 
-model = RandomForestClassifier(n_estimators=500)
+model = RandomForestClassifier(n_estimators=100)
 model.fit(trainX,trainY)
 
 print('importance',model.feature_importances_)
@@ -69,10 +74,13 @@ print(np.shape(predicted), np.shape(testY))
 print(predicted[0],testY[0])
 # print(np.mean((predicted - testY) ** 2))
 sum = 0
+
 for i in range(len(predicted)):
     sum+= (float(predicted[i]) - float(testY[i])) ** 2
 import math
 print(sum,sum/len(predicted),math.sqrt(sum/len(predicted)))
+
+
 
 
 
